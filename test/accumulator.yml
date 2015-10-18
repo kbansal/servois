@@ -1,0 +1,46 @@
+
+# Accumulator abstract definition
+
+name: accumulator
+
+state:
+  - name: contents
+    type: Int
+
+options:
+  
+
+states_equal:
+  definition: (= contents_1 contents_2)
+
+methods:
+  - name: increase
+    args:
+      - name: n
+        type: Int
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (and (= contents_new (+ contents n))
+           (= result true))
+    terms:
+      Int: [$1, contents, (+ contents $1)]
+  - name: read
+    args: []
+    return:
+      - name: result
+        type: Int
+    requires: |
+      true
+    ensures: |
+      (and (= contents_new contents)
+           (= result contents))
+    terms:
+      Int: [contents]
+
+predicates:
+  - name: "="
+    type: [Int, Int]

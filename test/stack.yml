@@ -1,0 +1,82 @@
+
+# Stack definition
+
+name: stack
+
+preamble: |
+  (declare-sort E 0)
+
+state:
+  - name: size
+    type: Int
+  - name: top
+    type: E
+  - name: nextToTop
+    type: E
+  - name: secondToTop
+    type: E
+  - name: thirdToTop
+    type: E
+
+states_equal:
+  definition:
+    (and (= size_1 size_2)
+         (or (= size_1 0)
+             (and (= size_1 1) (= top_1 top_2))
+             (and (= top_1 top_2) (= nextToTop_1 nextToTop_2))))
+
+methods:
+  - name: push
+    args:
+      - name: v
+        type: E
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      (>= size 0)
+    ensures: |
+      (and (= size_new (+ size 1))
+           (= top_new v)
+           (= nextToTop_new top)
+           (= secondToTop_new nextToTop)
+           (= thirdToTop_new secondToTop)
+           (= result true))
+    terms:
+      Int: [size, 1, (+ size 1)]
+      E: [top, nextToTop, secondToTop, thirdToTop, $1]
+  - name: pop
+    args: []
+    return:
+      - name: result
+        type: E
+    requires: |
+      (>= size 1)
+    ensures: |
+      (and (= size_new (- size 1))
+           (= result top)
+           (= top_new nextToTop)
+           (= nextToTop_new secondToTop)
+           (= secondToTop_new thirdToTop))
+    terms:
+      Int: [size, 1, (- size 1), 0]
+      E: [top, nextToTop, secondToTop, thirdToTop]
+  - name: clear
+    args: []
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      (>= size 0)
+    ensures: |
+      (and (= size_new 0)
+           (= result true))
+    terms:
+      Int: [size, 0]
+      E: [top, nextToTop, secondToTop, thirdToTop]
+
+predicates:
+  - name: "="
+    type: [Int, Int]
+  - name: "="
+    type: [E, E]

@@ -1,0 +1,29 @@
+Servois
+=======
+
+Servois is an experimental tool for automatically generating
+commutativity conditions from data-structure specifications.
+
+Please see
+  http://cs.nyu.edu/~kshitij/projects/servois
+for more details about the project.
+
+Dependecies
+-----------
+
+Requires CVC4 development builds, download from here
+  http://cvc4.cs.nyu.edu/downloads/
+
+Install CVC4 at /usr/local/bin/cvc4. Alternatively, update
+src/synth.py
+
+Examples
+--------
+
+There are several examples in the test/ directory. A python script
+runs all the examples.
+
+  cd test
+  ./runall.py
+
+--Kshitij Bansal <kshitij@cs.nyu.edu> [Sun, 18 Oct 2015 00:14:27 -0400]

@@ -1,0 +1,97 @@
+name: set
+
+preamble: |
+  (declare-sort E 0)
+
+state:
+  - name: S
+    type: (Set E)
+  - name: size
+    type: Int
+
+states_equal:
+  definition: (and (= S_1 S_2) (= size_1 size_2))
+
+methods:
+  - name: add
+    args:
+      - name: v
+        type: E
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (ite (member v S)
+           (and (= S_new S)
+                (= size_new size)
+                (not result))
+           (and (= S_new (union S (singleton v)))
+                (= size_new (+ size 1))
+                result))
+    terms:
+      E: [$1]
+      Int: [size, 1, (+ size 1)]
+      (Set E): [S, (singleton $1), (union S (singleton $1))]
+  - name: remove
+    args:
+      - name: v
+        type: E
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (ite (member v S)
+           (and (= S_new (setminus S (singleton v)))
+                (= size_new (- size 1))
+                result)
+           (and (= S_new S)
+                (= size_new size)
+                (not result)))
+    terms:
+      E: [$1]
+      Int: [size, 1, (- size 1)]
+      (Set E): [S, (singleton $1), (setminus S (singleton $1))]
+  - name: contains
+    args:
+      - name: v
+        type: E
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (and (= S_new S)
+           (= size_new size)
+           (= (member v S) result))
+    terms:
+      E: [$1]
+      Int: [size]
+      (Set E): [S, (singleton $1), (setminus S (singleton $1))]
+  - name: getsize
+    args: []
+    return:
+      - name: result
+        type: Int
+    requires: |
+      true
+    ensures: |
+      (and (= S_new S)
+           (= size_new size)
+           (= size result))
+    terms:
+      Int: [size]
+
+predicates:
+  - name: "="
+    type: [Int, Int]
+  - name: "="
+    type: [E, E]
+  - name: "="
+    type: [(Set E), (Set E)]
+  - name: "member"
+    type: [E, (Set E)]
