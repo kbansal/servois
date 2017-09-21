@@ -27,9 +27,9 @@ class Method:
 
 class Specification:
     """Internal representation of the specification. This currently
-    carries more information that just the transition relation.
-    Serves as sort of intermiate format between different stages of
-    the program. As the program grows this might become as issue,
+    carries more information than just the transition relation.
+    Serves as sort of intermediate format between different stages of
+    the program. As the program grows this might become an issue,
     would be addressed then."""
     def __init__(self, spec):
         self.spec = spec
@@ -43,7 +43,7 @@ class Specification:
                                 m["terms"])
                          for m in spec["methods"] ]
     def getPreamble(self):
-        if 'preamble' in self.spec:
+        if "preamble" in self.spec:
             return self.spec['preamble']
         else:
             return None
@@ -59,7 +59,10 @@ class Specification:
     def getMethods(self):
         return self.spec["methods"]
     def getStatesEqualDefinition(self):
-        return self.spec["states_equal"]["definition"]
+        if "states_equal" in self.spec:
+            return self.spec["states_equal"]["definition"]
+        # compute the definition automatically as just equality
+        return And(["(= %s_1 %s_2)" % (s,s) for s in self.getStateNames()])
     def getPredicates(self):
         return self.spec["predicates"]
 
@@ -90,6 +93,11 @@ def DefineFun(name, args, return_type, definition):
     ret += " )\n"
     return ret
 
+def And(l):
+    if not l: return "true"
+    if len(l) == 1: return l[0]
+    return "(and " + " ".join(l) + ")"
+
 ############################################################
 # Abstract Spec -> Abstract SMT Definition
 ############################################################
@@ -102,7 +110,7 @@ def specToSmtDef(spec):
     if spec.getPreamble():
         ret += spec.getPreamble()
         ret += "\n"
-    
+
     s1 = StateVar(spec.getState(), "_1")
     s2 = StateVar(spec.getState(), "_2")
 

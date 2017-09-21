@@ -29,12 +29,6 @@ if not os.path.isfile(cvc4[0]):
     print("Please update source if installed at a different location.")
     sys.exit(1)
 
-versioninfo = subprocess.check_output([cvc4[0], '--version']).splitlines()
-if not "version 1.5" in versioninfo[0]:
-    print("Version of CVC4 installed too old. Please install 1.5-prelease or higher. Download from:")
-    print(" http://cvc4.cs.nyu.edu/downloads/ (development versions)")
-    sys.exit(1)
-
 ########################################
 # arguments
 ########################################
@@ -389,7 +383,7 @@ def synth(H, i, poke=False):
     if len(predicates) == i:
         print("Couldn't finish: ", H)
         answer_complete = False
-        return
+        return []
 
     if len(interesting_indices) > 0:
         j = interesting_indices[0][2]

@@ -35,7 +35,7 @@ FULLRESULTS="fullresults.tex"
 
 #datastructures=['Hashtable']
 #datastructures=['Counter']
-datastructures=['Counter','Counter (lifted, auto-generated)','Accumulator','Set','HashTable','Stack']#,'Queue']
+datastructures=['Counter','Accumulator','Set','HashTable','Stack']#,'Queue']
 labels={'Counter':'counter',
         'Counter (lifted, auto-generated)':'counterauto',
         'Accumulator':'accumulator',

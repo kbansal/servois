@@ -6,8 +6,8 @@ state:
   - name: contents
     type: Int
 
-states_equal:
-  definition: (= contents_1 contents_2)
+# states_equal:
+#   definition: (= contents_1 contents_2)
 
 methods:
   - name: increment

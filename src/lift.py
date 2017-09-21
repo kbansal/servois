@@ -13,7 +13,8 @@ def liftSpec(old_spec):
 
     spec["state"].append({"name":"err","type":"Bool"})
 
-    se = spec["states_equal"]["definition"]
+    se = old_spec.getStatesEqualDefinition()
+    spec["states_equal"] = {}
     spec["states_equal"]["definition"] = "(or (and err_1 err_2) (and (not err_1) (not err_2)\n" + se + "\n))"
 
     for m in spec["methods"]:
