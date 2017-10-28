@@ -345,6 +345,32 @@ def valid(formula, getvalue=[], getvalue_result={}):
         print("Exit at error point B in valid()")
     return (out == "unsat\n")
 
+def ret_from_1_and_2(p, ret1, ret2):
+  # ret_t = nary("or", [
+  #      nary("and", [predicates[i], ret_1_t])
+  #      nary("and", ["(not " + predicates[i] + ")", ret_2_t])])
+  #
+  # Simplifications:
+  # 1. If ret_1_t == ret_2_t: return ret_1_t
+  # 2a. If ret_1_t == true: return (or p ret_2_t)
+  # 2b. If ret_2_t == true: return (or ret_1_t (not p))
+  # 3a. If ret_1_t == false: return ret_2_t
+  # 3b. If ret_2_t == false: return ret_1_t
+  #
+  # Similarily for ret_1_f/ret_2_f.
+  assert(ret1 != "true" or ret2 != "true")
+  assert(ret1 != "false" or ret2 != "false")
+  if ret1 == ret2: return ret1
+  if ret1 == "true": return nary("or", [p, ret2])
+  if ret2 == "true": return nary("or", [ret1, "(not " + p + ")"])
+  if ret1 == "false": return nary("and", ["(not " + p + ")", ret2])
+  if ret2 == "false": return nary("and", [p, ret1])
+  return nary("or", [nary("and", [p, ret1]),
+                     nary("and", ["(not " + p + ")", ret2])])
+
+
+# When poke=False, return assumming H[1:-1] split of H[-1] that commutes,
+# and that doesn't.
 def synth(H, i, poke=False):
     global answer_complete
 
@@ -355,7 +381,7 @@ def synth(H, i, poke=False):
         if poke:
             return 0
         bottom.append(H[1:])
-        return []
+        return ("false", "true")
 
     t_query = "(=> " + nary('and', H) + " bowtie)"
     t_getvalue = {}
@@ -364,7 +390,7 @@ def synth(H, i, poke=False):
         if poke:
             return 0
         top.append(H[1:])
-        return [[]]
+        return ("true", "false")
 
     interesting_indices = []
     for j in range(len(predicates[i:])):
@@ -404,13 +430,19 @@ def synth(H, i, poke=False):
         j = interesting_indices[0][2]
         predicates[i], predicates[j] = predicates[j], predicates[i]
     
-    ret_1 = synth(H + [predicates[i]], i + 1)
-    ret_2 = synth(H + ["(not " + predicates[i] + ")"], i + 1)
-    if ret_1 == ret_2:
-        return ret_1
-    else:
-        return ([[predicates[i]] + l for l in ret_1]+
-                [["(not " + predicates[i] + ")"]+l for l in ret_2])
+    (ret_1_t, ret_1_f)  = synth(H + [predicates[i]], i + 1)
+    (ret_2_t, ret_2_f) = synth(H + ["(not " + predicates[i] + ")"], i + 1)
+    ret_t = ret_from_1_and_2(predicates[i], ret_1_t, ret_2_t)
+    ret_f = ret_from_1_and_2(predicates[i], ret_1_f, ret_2_f)
+    return ret_t, ret_f
+    # if ret_1_t == ret_2_t:
+    #   ret_t = ret_1_t
+    # else:
+    # if ret_1_f == ret_2_f:
+    #   ret_f = ret_1_f
+    # else:
+    #     return ([[predicates[i]] + l for l in ret_1]+
+    #             [["(not " + predicates[i] + ")"]+l for l in ret_2])
 
 if args.check == "deterministic":
     print(valid("deterministic"))
@@ -436,10 +468,13 @@ stats["predicatesFiltered"] = len(predicates)
 if verbosity >= 2:print("***")
 if verbosity >= 2:print('\n'.join(predicates))
 
-synth(["oper"], 0)
+top_expr, bot_expr = synth(["oper"], 0)
 
-if verbosity >= 2:print("top:    ", top)
-if verbosity >= 2:print("bottom: ", bottom)
+if verbosity >= 2:print("top:    ", top_as_formula())
+if verbosity >= 2:print("bottom: ", bottom_as_formula())
+if verbosity >= 2:print("top_expr:", simplifyUsingSMTSolver(top_expr))
+if verbosity >= 2:print("bot_expr:", simplifyUsingSMTSolver(bot_expr))
+
 
 if verbosity >= 2:
     print("Completeness check: ", end='')

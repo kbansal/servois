@@ -40,7 +40,7 @@ class Specification:
                                 m["return"],
                                 m["requires"],
                                 m["ensures"],
-                                m["terms"])
+                                m["terms"] if "terms" in m else [])
                          for m in spec["methods"] ]
     def getPreamble(self):
         if "preamble" in self.spec:
@@ -64,7 +64,7 @@ class Specification:
         # compute the definition automatically as just equality
         return And(["(= %s_1 %s_2)" % (s,s) for s in self.getStateNames()])
     def getPredicates(self):
-        return self.spec["predicates"]
+        return self.spec["predicates"] if "predicates" in self else []
 
 
 
