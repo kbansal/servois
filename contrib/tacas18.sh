@@ -19,6 +19,4 @@ python -c "import yaml" || {
 } && echo "CVC4 already found or installed."
 
 cd ../test
-
-# Datastructures case study.
-./runall.py
+sudo ./runall.py
