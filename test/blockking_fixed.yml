@@ -1,0 +1,53 @@
+name: blockking_fixed
+
+preamble: |
+  (declare-fun modFn (Int) Int)
+
+state:
+  - name: warrior
+    type: (Array Int Int)
+  - name: warriorGold
+    type: (Array Int Int)
+  - name: warriorBlock
+    type: (Array Int Int)
+  - name: king
+    type: Int
+  - name: kingBlock
+    type: Int
+
+methods:
+  - name: enter
+    args:
+      - name: msg_value
+        type: Int
+      - name: msg_sender
+        type: Int
+      - name: block_number
+        type: Int
+      - name: random
+        type: Int
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (and result
+      (ite (< msg_value 50)
+           (states_equal warrior warriorGold warriorBlock
+                         king kingBlock err
+                         warrior_new warriorGold_new warriorBlock_new
+                         king_new kingBlock_new err_new)
+           (and (= warrior_new (store warrior msg_sender msg_sender))
+                (= warriorGold_new (store warriorGold msg_sender msg_value))
+                (= warriorBlock_new (store warriorBlock msg_sender block_number))
+                (ite (= (modFn (select warriorBlock_new msg_sender)) random)
+                     (and (= king_new (select warrior_new msg_sender))
+                          (= kingBlock_new (select warriorBlock_new msg_sender)))
+                     (and (= king_new king)
+                          (= kingBlock_new kingBlock))
+                )
+           )
+      )
+      )
+

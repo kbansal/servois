@@ -1,0 +1,53 @@
+name: blockking
+
+preamble: |
+  (declare-fun modFn (Int) Int)
+
+state:
+  - name: warrior
+    type: Int
+  - name: warriorGold
+    type: Int
+  - name: warriorBlock
+    type: Int
+  - name: king
+    type: Int
+  - name: kingBlock
+    type: Int
+
+methods:
+  - name: enter
+    args:
+      - name: msg_value
+        type: Int
+      - name: msg_sender
+        type: Int
+      - name: block_number
+        type: Int
+      - name: random
+        type: Int
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (and result
+      (ite (< msg_value 50)
+           (states_equal warrior warriorGold warriorBlock
+                         king kingBlock err
+                         warrior_new warriorGold_new warriorBlock_new
+                         king_new kingBlock_new err_new)
+           (and (= warrior_new msg_sender)
+                (= warriorGold_new msg_value)
+                (= warriorBlock_new block_number)
+                (ite (= (modFn warriorBlock_new) random)
+                     (and (= king_new warrior_new)
+                          (= kingBlock_new warriorBlock_new))
+                     (and (= king_new king)
+                          (= kingBlock_new kingBlock))
+                )
+           )
+      )
+      )
+

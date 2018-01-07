@@ -14,6 +14,7 @@ from parser import *
 CACHEFILE="runall_cache.pycache"
 readCache = True
 writeCache = True
+debug = False
 
 OPERDEFSFILE="operdefs.tex"
 writeOperDefs = False
@@ -27,7 +28,7 @@ if readCache:
     if os.path.isfile(CACHEFILE):
         with open(CACHEFILE, 'rb') as input:
             outputCache = pickle.load(input)
-print(yaml.dump(outputCache, default_flow_style=False))
+if debug: print(yaml.dump(outputCache, default_flow_style=False))
 
 APPENDIXFILE="raw.tex"
 
@@ -128,7 +129,7 @@ def latexifySmt2(l, checktype, compress):
 def printRow(ds, method1, method2, sC, output, checktype, append=None):
     precondition = sC[bestopt]["output"]
     preconditionNoPoke = sC['--no-poke']["output"]
-    print("printRow:", precondition)
+    if debug: print("printRow:", precondition)
     queriesPoke = sC['--poke']["smtqueries"]
     smttimePoke = sC['--poke']["time"]
     queriesNoPoke = sC['--no-poke']["smtqueries"]
@@ -185,6 +186,7 @@ first = True
 predsout = open(PREDS, 'wb')
 
 with open(RESULTSTABLEFILE, 'wb') as output, open(APPENDIXFILE, 'wb') as appendix:
+    # Data structures case-study.
     for ds in datastructures:
         if "auto" not in ds:
             if first:
@@ -266,6 +268,10 @@ with open(RESULTSTABLEFILE, 'wb') as output, open(APPENDIXFILE, 'wb') as appendi
                 maxPredF = max(maxPredF, int(sC[bestopt]["predicatesFiltered"]))
         print(str(minPred)+"-"+str(maxPred)+" ("+str(minPredF)+"-"+str(maxPredF)+")%", file=predsout)
         print("\end{itemize}\n", file=appendix)
+
+    # Ethereum case-study.
+    print(getPrecondition("../src/synth.py -v --no-generate-predicates blockking.yml enter enter blockking_predicates.txt", False)['output'])
+    print(getPrecondition("../src/synth.py -v --no-generate-predicates blockking_fixed.yml enter enter blockking_predicates.txt", False)['output'])
 
 
 if writeCache:
