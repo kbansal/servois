@@ -1,0 +1,139 @@
+name: pqueue
+
+preamble: |
+  (declare-sort E 0)
+  (declare-sort F 0)
+
+state:
+  - name: priorities
+    type: (Set E)
+  - name: H
+    type: (Array E F)
+  - name: size
+    type: Int
+
+states_equal:
+  definition: |
+    (and (= priorities_1 priorities_2)
+         (= H_1 H_2)
+         (= size_1 size_2))
+
+methods:
+  - name: enq
+    args:
+      - name: i
+        type: E
+      - name: x
+        type: F
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+
+
+
+
+
+
+
+
+
+
+      (ite (member v keys)
+           (and (= keys_new (setminus keys (singleton v)))
+                (= size_new (- size 1))
+                (= H_new H)
+                result)
+           (and (= keys_new keys)
+                (= size_new size)
+                (= H_new H)
+                (not result)))
+    terms:
+      Int: [size, 1, (- size 1)]
+      E: [$1]
+      (Set E): [keys, (singleton $1), (setminus keys (singleton $1))]
+      (Array E F): [H]
+  - name: put
+    args:
+      - name: k0
+        type: E
+      - name: v0
+        type: F
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (ite (member k0 keys)
+           (and (= keys_new keys)
+                (= size_new size)
+                (ite (= v0 (select H k0))
+                     (and (not result)
+                          (= H_new H))
+                     (and result
+                          (= H_new (store H k0 v0)))))
+           (and (= keys_new (insert k0 keys))
+                (= size_new (+ size 1))
+                result
+                (= H_new (store H k0 v0))))
+    terms:
+      Int: [size, 1, (+ size 1)]
+      E: [$1]
+      F: [$2, (select H $1), ]
+      (Set E): [keys, (insert $1 keys)]
+      (Array E F): [H, (store H $1 $2)]
+  - name: get
+    args:
+      - name: k0
+        type: E
+    return:
+      - name: result
+        type: F
+    requires: |
+      (member k0 keys)
+    ensures: |
+      (and (= keys_new keys)
+           (= H_new H)
+           (= size_new size)
+           (= (select H k0) result)
+           )
+    terms:
+      Int: [size]
+      E: [$1]
+      F: [(select H $1)]
+      (Set E): [keys]
+      (Array E F): [H]
+  - name: size
+    args: []
+    return:
+      - name: result
+        type: Int
+    requires: |
+      true
+    ensures: |
+      (and (= keys_new keys)
+           (= H_new H)
+           (= size_new size)
+           (= size result))
+    terms:
+      Int: [size]
+      (Set E): [keys]
+      (Array E F): [H]
+
+predicates:
+  - name: "="
+    type: [Int, Int]
+  - name: "="
+    type: [E, E]
+  - name: "="
+    type: [F, F]
+  - name: "="
+    type: [(Set E), (Set E)]
+  - name: "="
+    type: [(Array E F), (Array E F)]
+  - name: "member"
+    type: [E, (Set E)]
+
