@@ -223,6 +223,10 @@ if args.generate_predicates:
 else:
     if verbosity >= 1: print("Skipping automatic predicate generation.")
 
+if len(predicates) == 0:
+    print("ERROR: no predicates.")
+    sys.exit(1)
+
 ########################################
 # main
 ########################################
@@ -359,7 +363,6 @@ def ret_from_1_and_2(p, ret1, ret2):
   #
   # Similarily for ret_1_f/ret_2_f.
   assert(ret1 != "true" or ret2 != "true")
-  assert(ret1 != "false" or ret2 != "false")
   if ret1 == ret2: return ret1
   if ret1 == "true": return nary("or", [p, ret2])
   if ret2 == "true": return nary("or", [ret1, "(not " + p + ")"])
@@ -424,7 +427,7 @@ def synth(H, i, poke=False):
     if len(predicates) == i:
         print("Couldn't finish: ", H)
         answer_complete = False
-        return []
+        return ["false", "false"]
 
     if len(interesting_indices) > 0:
         j = interesting_indices[0][2]
