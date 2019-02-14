@@ -1,0 +1,73 @@
+# Counter data structure's abstract definition
+
+name: memory
+
+preamble: |
+  (declare-sort E 0)
+  (declare-sort F 0)
+
+state:
+  - name: varnames
+    type: (Set E)
+  - name: contents
+    type: (Array E Int)
+
+# states_equal:
+#   definition: (= contents_1 contents_2)
+
+state:
+  - name: keys
+    type: (Set E)
+  - name: H
+    type: (Array E F)
+  - name: size
+    type: Int
+
+states_equal:
+  definition: |
+    (and (= varnames_1 varnames_2)
+         (= contents_1 contents_2))
+
+methods:
+  - name: read
+    args:
+      - name: x
+        type: E
+    return:
+      - name: result
+        type: Int
+    requires: |
+      true
+    ensures: |
+      (and (= contents_new contents)
+           (= varnames_new varnames)
+           (= result (select contents x))
+    terms:
+      Int: [contents, result, varnames]
+  - name: write
+    args:
+      - name: x
+        type: E
+      - name: v
+        type: Int
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (ite (member x varnames)
+           (and result
+                (= varnames_new varnames)
+                (ite (= v (select contents x))
+                     (= contents_new contents)
+                     (= contents_new (store contents x v))))
+            (and result
+                 (= varnames_new (insert x varnames))
+                 (= contents_new (store contents x v))))
+    terms:
+      Int: [contents, 1, (- contents 1), 0]
+
+predicates:
+  - name: "="
+    type: [Int, Int]
