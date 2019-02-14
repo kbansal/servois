@@ -1,0 +1,76 @@
+# Counter data structure's abstract definition
+
+name: memory
+
+preamble: |
+  (declare-sort E 0)
+
+state:
+  - name: varnames
+    type: (Set E)
+  - name: contents
+    type: (Array E Int)
+
+states_equal:
+  definition: |
+    (and (= varnames_1 varnames_2)
+         (= contents_1 contents_2))
+
+methods:
+  - name: read
+    args:
+      - name: x0
+        type: E
+    return:
+      - name: result
+        type: Int
+    requires: |
+      true
+    ensures: |
+      (and (= contents_new contents)
+           (= varnames_new varnames)
+           (= result (select contents x0)))
+    terms:
+      Int: [(select contents $1)]
+      E: [$1]
+      (Set E): [varnames, (singleton $1), (setminus varnames (singleton $1))]
+      (Array E Int): [contents]
+  - name: write
+    args:
+      - name: x0
+        type: E
+      - name: v
+        type: Int
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (ite (member x0 varnames)
+           (and result
+                (= varnames_new varnames)
+                (ite (= v (select contents x0))
+                     (= contents_new contents)
+                     (= contents_new (store contents x0 v))))
+            (and result
+                 (= varnames_new (insert x0 varnames))
+                 (= contents_new (store contents x0 v))))
+    terms:
+      Int: [$2, (select contents $1)]
+      E: [$1]
+      (Set E): [varnames, (singleton $1), (setminus varnames (singleton $1))]
+      (Array E Int): [contents]
+#      Int: [contents]
+
+predicates:
+  - name: "="
+    type: [Int, Int]
+  - name: "="
+    type: [E, E]
+  - name: "="
+    type: [(Set E), (Set E)]
+  - name: "="
+    type: [(Array E Int), (Array E Int)]
+  - name: "member"
+    type: [E, (Set E)]
