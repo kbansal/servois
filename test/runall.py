@@ -36,12 +36,13 @@ FULLRESULTS="fullresults.tex"
 
 #datastructures=['Hashtable']
 #datastructures=['Counter']
-datastructures=['Counter','Accumulator','Set','HashTable','Stack']#,'Queue']
+datastructures=['Counter','Accumulator','Set','HashTable','Stack','Memory']#,'Queue']
 labels={'Counter':'counter',
         'Counter (lifted, auto-generated)':'counterauto',
         'Accumulator':'accumulator',
         'Set':'set',
         'HashTable':'hashtable',
+	'Memory':'memory',
         'Stack':'stack'}
 forceruns=[]
 bestopt = '--poke'
