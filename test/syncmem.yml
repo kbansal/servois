@@ -5,23 +5,21 @@ name: syncmem
 
 preamble: |
   (declare-sort E 0)
+  (declare-datatypes (T1 T2) ((Pair (mk-pair (first T1) (second T2)))))
   (declare-sort F 0)
 
 state:
   - name: varnames
     type: (Set E)
-  - name: threadids
-    type: (Set F)
   - name: contents
     type: (Array E Int)
   - name: var2locks
-    type: (Array E F)
+    type: (Array E (Pair Bool F))
 
 states_equal:
   definition: |
     (and (= varnames_1 varnames_2)
          (= contents_1 contents_2)
-         (= threadids_1 threadids_2)
          (= var2locks_1 var2locks_2))
 
 methods:
@@ -39,19 +37,20 @@ methods:
     ensures: |
       (and (= contents_new contents)
            (= varnames_new varnames)
-           (= threadids_new threadids)
            (= var2locks_new var2locks)
-           (ite (= tid0 (select var2locks x0))
+           (ite (and (= true (first  (select var2locks x0)))
+                     (= tid0 (second (select var2locks x0))))
                 (= result (select contents x0))
                 (= result (- 0 1))))
     terms:
       Int: [(select contents $2)]
       E: [$2]
-      F: [$1, (select var2locks $2)]
+      F: [$1, (second (select var2locks $2))]
+      Bool: [(first (select var2locks $2))]
       (Set E): [varnames, (singleton $2), (setminus varnames (singleton $2))]
-      (Set F): [threadids, (singleton $1), (setminus threadids (singleton $1))]
+      (Set F): [(singleton $1)]
       (Array E Int): [contents]
-      (Array F Int): [var2locks]
+      (Array E (Pair Bool F)): [var2locks]
   - name: trywrite
     args:
       - name: tid0
@@ -66,34 +65,61 @@ methods:
     requires: |
       true
     ensures: |
-      (ite (and (member tid0 threadids) (= tid0 (select var2locks x0)))
+      (ite (and (= true (first  (select var2locks x0)))
+                (= tid0 (second (select var2locks x0))))
            (ite (member x0 varnames)
                 (and result
                      (= var2locks_new var2locks)
-                     (= threadids_new threadids)
                      (= varnames_new varnames)
                      (ite (= v (select contents x0))
                           (= contents_new contents)
                           (= contents_new (store contents x0 v))))
                 (and result
                      (= var2locks_new var2locks)
-                     (= threadids_new threadids)
                      (= varnames_new (insert x0 varnames))
                      (= contents_new (store contents x0 v))))
            (and (= result false)
                 (= varnames_new varnames)
                 (= contents_new contents)
+                (= var2locks_new var2locks)))
+  - name: lock
+    args:
+      - name: tid0
+        type: F
+      - name: x0
+        type: E
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (ite (and (= true (first  (select var2locks x0)))   ; I hold the lock
+                (= tid0 (second (select var2locks x0))))
+           (and result
                 (= var2locks_new var2locks)
-                (= threadids_new threadids)))
-
+                (= varnames_new varnames)
+                (= contents_new contents))
+           (ite (= false (first  (select var2locks x0)))  ; it is unlocked
+                (and result
+                     (= var2locks_new (store var2locks x0 (mk-pair true tid0)))
+                     (= varnames_new varnames)
+                     (= contents_new contents))
+                ; someone else has the lock
+                (and (= result false)
+                   (= varnames_new varnames)
+                   (= contents_new contents)
+                   (= var2locks_new var2locks))))
     terms:
-      Int: [$3, (select contents $2)]
+      Int: [(select contents $2)]
       E: [$2]
-      F: [$1, (select var2locks $2)]
+      F: [$1, (second (select var2locks $2))]
+      Bool: [(first (select var2locks $2))]
       (Set E): [varnames, (singleton $2), (setminus varnames (singleton $2))]
-      (Set F): [threadids, (singleton $1), (setminus threadids (singleton $1))]
+      (Set F): [(singleton $1)]
       (Array E Int): [contents]
-      (Array E F): [var2locks]
+      (Array E (Pair Bool F)): [var2locks]
+
 #      Int: [contents]
 
 predicates:
@@ -108,7 +134,7 @@ predicates:
   - name: "="
     type: [(Array E Int), (Array E Int)]
   - name: "="
-    type: [(Array E F), (Array E F)]
+    type: [(Array E (Pair Bool F)), (Array E (Pair Bool F))]
   - name: "member"
     type: [E, (Set E)]
   - name: "member"
