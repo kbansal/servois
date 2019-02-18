@@ -119,6 +119,43 @@ methods:
       (Set F): [(singleton $1)]
       (Array E Int): [contents]
       (Array E (Pair Bool F)): [var2locks]
+  - name: unlock
+    args:
+      - name: tid0
+        type: F
+      - name: x0
+        type: E
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (ite (and (= true (first  (select var2locks x0)))   ; I hold the lock
+                (= tid0 (second (select var2locks x0))))
+           (and result
+                (= var2locks_new (store var2locks x0 (mk-pair false tid0)))
+                (= varnames_new varnames)
+                (= contents_new contents))
+           (ite (= false (first  (select var2locks x0)))  ; it is unlocked
+                (and result
+                     (= var2locks_new var2locks)
+                     (= varnames_new varnames)
+                     (= contents_new contents))
+                ; someone else has the lock
+                (and (= result false)
+                   (= varnames_new varnames)
+                   (= contents_new contents)
+                   (= var2locks_new var2locks))))
+    terms:
+      Int: [(select contents $2)]
+      E: [$2]
+      F: [$1, (second (select var2locks $2))]
+      Bool: [(first (select var2locks $2))]
+      (Set E): [varnames, (singleton $2), (setminus varnames (singleton $2))]
+      (Set F): [(singleton $1)]
+      (Array E Int): [contents]
+      (Array E (Pair Bool F)): [var2locks]
 
 #      Int: [contents]
 
