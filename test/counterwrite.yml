@@ -1,0 +1,78 @@
+# Counter data structure's abstract definition, with a write()
+
+name: counterwrite
+
+state:
+  - name: contents
+    type: Int
+
+# states_equal:
+#   definition: (= contents_1 contents_2)
+
+methods:
+  - name: increment
+    args: []
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      (>= contents 0)
+    ensures: |
+      (and (= contents_new (+ contents 1))
+           (= result true))
+    terms:
+      Int: [contents, 1, (+ contents 1)]
+  - name: write
+    args:
+      - name: val
+        type: Int
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (and (= contents_new val)
+           (= result true))
+    terms:
+      Int: [contents, 1, $1, (+ contents 1)]
+  - name: decrement
+    args: []
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      (>= contents 1)
+    ensures: |
+      (and (= contents_new (- contents 1))
+           (= result true))
+    terms:
+      Int: [contents, 1, (- contents 1), 0]
+  - name: reset
+    args: []
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      (>= contents 0)
+    ensures: |
+      (and (= contents_new 0)
+           (= result true))
+    terms:
+      Int: [contents, 0]
+  - name: zero
+    args: []
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      (>= contents 0)
+    ensures: |
+      (and (= contents_new contents)
+           (= result (= contents 0)))
+    terms:
+      Int: [contents, 0]
+
+predicates:
+  - name: "="
+    type: [Int, Int]
