@@ -14,7 +14,7 @@ from parser import *
 CACHEFILE="runall_cache.pycache"
 readCache = True
 writeCache = True
-debug = False
+debug = True # False
 
 OPERDEFSFILE="operdefs.tex"
 writeOperDefs = False
@@ -35,8 +35,8 @@ APPENDIXFILE="raw.tex"
 FULLRESULTS="fullresults.tex"
 
 #datastructures=['Hashtable']
-#datastructures=['Counter']
-datastructures=['Memory']
+datastructures=['Simplelockmem']
+#datastructures=['Simplelockmem'] # Counterwrite'] # Lockmem'] # Memory, Syncmem
 #datastructures=['Counter','Accumulator','Set','HashTable','Stack']#,'Queue']
 labels={'Counter':'counter',
         'Counter (lifted, auto-generated)':'counterauto',
@@ -44,6 +44,10 @@ labels={'Counter':'counter',
         'Set':'set',
         'HashTable':'hashtable',
 	'Memory':'memory',
+        'Syncmem':'syncmem',
+        'Simplelockmem':'simplelockmem',
+	'Lockmem':'lockmem',
+	'Counterwrite':'counterwrite',
         'Stack':'stack'}
 forceruns=[]
 bestopt = '--poke'
@@ -272,8 +276,8 @@ with open(RESULTSTABLEFILE, 'wb') as output, open(APPENDIXFILE, 'wb') as appendi
         print("\end{itemize}\n", file=appendix)
 
     # Ethereum case-study.
-    print(getPrecondition("../src/synth.py -v --no-generate-predicates blockking.yml enter enter blockking_predicates.txt", False)['output'])
-    print(getPrecondition("../src/synth.py -v --no-generate-predicates blockking_fixed.yml enter enter blockking_predicates.txt", False)['output'])
+    #print(getPrecondition("../src/synth.py -v --no-generate-predicates blockking.yml enter enter blockking_predicates.txt", False)['output'])
+    #print(getPrecondition("../src/synth.py -v --no-generate-predicates blockking_fixed.yml enter enter blockking_predicates.txt", False)['output'])
 
 
 if writeCache:
