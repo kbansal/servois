@@ -1,4 +1,9 @@
 # Counter data structure's abstract definition, with a write()
+#
+#   incr and dewcr commute
+#   and write() commutes with zero() in some cases
+#   but write() never commutes with incr.
+#       write() never commutes with decr.
 
 name: counterwrite
 
