@@ -107,18 +107,17 @@ methods:
     requires: |
       true
     ensures: |
-      (ite (and (= true (first  (select var2locks x0)))   ; I hold the lock
+      (ite (and (= true (first  (select var2locks x0)))   
                 (= tid0 (second (select var2locks x0))))
            (and result
                 (= var2locks_new var2locks)
                 (= varnames_new varnames)
                 (= contents_new contents))
-           (ite (= false (first  (select var2locks x0)))  ; it is unlocked
+           (ite (= false (first  (select var2locks x0)))
                 (and result
                      (= var2locks_new (store var2locks x0 (mk-pair true tid0)))
                      (= varnames_new varnames)
                      (= contents_new contents))
-                ; someone else has the lock
                 (and (= result false)
                    (= varnames_new varnames)
                    (= contents_new contents)
@@ -144,18 +143,17 @@ methods:
     requires: |
       true
     ensures: |
-      (ite (and (= true (first  (select var2locks x0)))   ; I hold the lock
+      (ite (and (= true (first  (select var2locks x0)))   
                 (= tid0 (second (select var2locks x0))))
            (and result
                 (= var2locks_new (store var2locks x0 (mk-pair false tid0)))
                 (= varnames_new varnames)
                 (= contents_new contents))
-           (ite (= false (first  (select var2locks x0)))  ; it is unlocked
+           (ite (= false (first  (select var2locks x0)))  
                 (and result
                      (= var2locks_new var2locks)
                      (= varnames_new varnames)
                      (= contents_new contents))
-                ; someone else has the lock
                 (and (= result false)
                    (= varnames_new varnames)
                    (= contents_new contents)
@@ -169,8 +167,6 @@ methods:
       (Set F): [(singleton $1)]
       (Array E Int): [contents]
       (Array E (Pair Bool F)): [var2locks]
-
-#      Int: [contents]
 
 predicates:
   - name: "="
