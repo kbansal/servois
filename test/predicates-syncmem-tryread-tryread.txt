@@ -1,0 +1,6 @@
+(= x1 y1)
+(= x1 (second (select var2locks x2)))
+(= y1 (second (select var2locks y2)))
+(= x2 y2)
+(first (select var2locks x2))
+(first (select var2locks y2))

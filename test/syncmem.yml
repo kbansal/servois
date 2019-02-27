@@ -1,5 +1,18 @@
 # Synchronized memory data structure's abstract definition
 #   Every memory cell also has a corresponding lock
+#
+# predicates-syncmem-tryread-trywrite.txt
+# tryread(x1=tid) commutes with trywrite(y1=tid)
+# if
+#    ; same thread
+#
+# tryread() commutes with trywrite()
+# if
+#    ; different threads
+#    ; lock held by third party
+#
+# unlock(x1=tid, x2=var) moves to the left of 
+#
 
 name: syncmem
 
@@ -170,6 +183,8 @@ predicates:
     type: [(Set F), (Set F)]
   - name: "="
     type: [(Array E Int), (Array E Int)]
+  - name: "="
+    type: [(Pair Bool F), (Pair Bool F)]
   - name: "="
     type: [(Array E (Pair Bool F)), (Array E (Pair Bool F))]
   - name: "member"
