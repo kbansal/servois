@@ -11,6 +11,8 @@ for more details about the project.
 Dependecies
 -----------
 
+$ brew install pip
+
 Requires CVC4 development builds, download from here
   http://cvc4.cs.nyu.edu/downloads/
 

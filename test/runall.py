@@ -37,7 +37,7 @@ FULLRESULTS="fullresults.tex"
 #datastructures=['Hashtable']
 datastructures=['Simplelockmem']
 #datastructures=['Simplelockmem'] # Counterwrite'] # Lockmem'] # Memory, Syncmem
-#datastructures=['Counter','Accumulator','Set','HashTable','Stack']#,'Queue']
+#datastructures=['Counter','Accumulator','Set','HashTable','Stack','Memory']#,'Queue']
 labels={'Counter':'counter',
         'Counter (lifted, auto-generated)':'counterauto',
         'Accumulator':'accumulator',

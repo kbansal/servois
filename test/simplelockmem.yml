@@ -1,4 +1,15 @@
 # A single-cell memory and a lock. 
+#
+#  lock(x1=tid) commutes with lock(x2=tid)
+#    when lock is held by someone else
+#
+#
+#  unlock(x1=tid) can move to the left of write(y1=tid, y2=v)
+#  whenever
+#  (and
+#    (= lockid x1)    ; lock is held by unlocker
+#    (not (= x1 y1))  ; different threads  
+#  )
 
 name: simplelockmem
 
