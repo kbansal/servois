@@ -1,0 +1,126 @@
+# A single-cell memory and a lock. 
+
+name: simplelockmem
+
+preamble: |
+  (declare-sort F 0)
+
+state:
+  - name: mem
+    type: Int
+  - name: locked
+    type: Bool
+  - name: lockid
+    type: F
+
+states_equal:
+  definition: |
+    (and (= mem_1 mem_2)
+      (= locked_1 locked_2)
+      (= lockid_1 lockid_2))
+
+methods:
+  - name: read
+    args:
+      - name: tid0
+        type: F
+    return:
+      - name: result
+        type: Int
+    requires: |
+      true
+    ensures: |
+      (and (= locked_new locked)
+           (= lockid_new lockid)
+           (= mem_new mem)
+           (= result mem))
+    terms:
+      Int: [mem, $2]
+      F: [$1, lockid] 
+      Bool: [locked]
+  - name: write
+    args:
+      - name: tid0
+        type: F
+      - name: v
+        type: Int
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+       (and result
+           (= locked_new locked)
+           (= lockid_new lockid)
+           (= mem_new v))
+    terms:
+      Int: [$2, mem]
+      F: [$1, lockid] 
+      Bool: [locked]
+  - name: lock
+    args:
+      - name: tid0
+        type: F
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (ite (and locked (= lockid tid0))  ; I hold the lock
+           (and result
+                (= lockid_new lockid)
+                (= locked_new locked)
+                (= mem_new mem))
+           (ite (= false locked) ; it is unlocked
+                (and result
+                     (= locked_new true)
+                     (= lockid_new tid0)
+                     (= mem_new mem))
+                ; someone else has the lock
+                (and (= result false)
+                   (= locked_new locked)
+                   (= lockid_new lockid)
+                   (= mem_new mem))))
+    terms:
+      Int: [mem]
+      F: [$1, lockid]
+      Bool: []
+  - name: unlock
+    args:
+      - name: tid0
+        type: F
+    return:
+      - name: result
+        type: Bool
+    requires: |
+      true
+    ensures: |
+      (ite (and locked (= lockid tid0))  ; I hold the lock
+           (and result
+                (= lockid_new lockid)
+                (= locked_new false)
+                (= mem_new mem))
+           (ite (= false locked) ; it is unlocked
+                (and result
+                     (= locked_new false)
+                     (= lockid_new lockid)
+                     (= mem_new mem))
+                ; someone else has the lock
+                (and (= result false)
+                   (= locked_new locked)
+                   (= lockid_new lockid)
+                   (= mem_new mem))))
+    terms:
+      Int: [mem]
+      F: [$1, lockid]
+      Bool: [locked]
+
+predicates:
+  - name: "="
+    type: [Int, Int]
+  - name: "="
+    type: [F, F]
+  - name: "="
+    type: [Bool, Bool]

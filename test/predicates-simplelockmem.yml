@@ -1,0 +1,4 @@
+(= x1 y1)
+(= x1 lockid)
+(= y1 lockid)
+locked
