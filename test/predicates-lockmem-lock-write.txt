@@ -1,6 +1,7 @@
-(= x1 y1)
 (= x2 y2)
+(= x1 y1)
 (= x1 (second (select var2locks x2)))
 (= y1 (second (select var2locks y2)))
 (first (select var2locks x2))
 (first (select var2locks y2))
+(= y3 (select contents y2))
